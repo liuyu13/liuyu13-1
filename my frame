@@ -1,0 +1,150 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import javax.swing.*;
+class Myframe extends Frame implements ActionListener 
+{
+	
+	FileDialog filedialog_save,filedialog_load;
+	Button button1,button2;
+	Label label;
+	MenuBar bar;
+	Menu menu;
+	MenuItem itemOpen,itemSave;
+	TextArea texta;
+	Myframe(String s)    //创建对话框
+	{
+		super(s);
+                texta= new TextArea(38,160);
+		button1= new Button("加密");
+		button2= new Button("解密");
+		menu=new Menu("文件");
+		itemOpen=new MenuItem("打开");
+		itemSave=new MenuItem("保存");
+		label=new Label("文件浏览窗口");
+		itemOpen.addActionListener(this);
+		itemSave.addActionListener(this);
+		button1.addActionListener(this);
+		button2.addActionListener(this);
+		filedialog_save=new FileDialog(this,"保存文件对话框",FileDialog.SAVE);
+		filedialog_load=new FileDialog(this,"打开文件对话框",FileDialog.LOAD);
+		filedialog_save.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				filedialog_save.setVisible(false);
+			}
+		});
+		filedialog_load.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				filedialog_load.setVisible(false);
+			}
+		});
+		Box box1=Box.createHorizontalBox();//创建一个从左到右显示其组件的 box1;
+		Box box2=Box.createVerticalBox();//创建一个从上到下显示其组件的 box2;
+        Box box3=Box.createVerticalBox();
+		Box boxbase=Box.createVerticalBox();
+		Panel panel1=new Panel();
+		Panel panel2=new Panel();
+		setMenuBar(bar=new MenuBar());
+		bar.add(menu);
+		menu.add(itemOpen);
+	    menu.add(itemSave);
+		panel1.add(button1);
+		panel1.add(button2);
+		box1.add(panel1);
+		box2.add(label);
+		panel2.add(texta);
+		box3.add(panel2);
+		boxbase.add(box1);
+		boxbase.add(box2);
+		boxbase.add(box3);
+		add(boxbase);
+		setLayout(new FlowLayout());
+		setBounds(100,0,1200,750);
+		setVisible(true);
+	    addWindowListener(new WindowAdapter()
+		  {
+			  public void windowClosing(WindowEvent e)
+			  {
+				System.exit(0);
+			   }
+		  });		
+	}//“关闭”窗口事件;
+	public void actionPerformed(ActionEvent e)//查找读入文件
+	{
+		if(e.getSource()==itemOpen)
+		{
+			filedialog_load.setVisible(true);
+			texta.setText(null);
+			String s;
+			if(filedialog_load.getFile()!=null)
+			{
+				try
+				{
+					File file=new File(filedialog_load.getDirectory(),filedialog_load.getFile());
+					FileReader file_reader=new FileReader(file);//读取字符流
+					BufferedReader in=new BufferedReader(file_reader);
+					while((s=in.readLine())!=null)
+						texta.append(s+'\n');
+					in.close();
+					file_reader.close();
+				}
+				catch (IOException e1)
+				{
+				}
+			}
+		}
+		if(e.getSource()==itemSave)//查找写入的文件
+		{
+			filedialog_save.setVisible(true);
+			if(filedialog_save.getFile()!=null)
+			{
+				try
+				{
+					File file=new File(filedialog_save.getDirectory(),filedialog_save.getFile());
+					FileWriter tofile=new FileWriter(file);//读取字符流
+					BufferedWriter out=new BufferedWriter(tofile);
+					out.write(texta.getText(),0,(texta.getText()).length());
+					out.close();
+					tofile.close();
+				}
+				catch (IOException e2)
+				{
+				}
+			}
+		}
+		if(e.getSource()==button1)
+		{
+			char a[]=texta.getText().toCharArray();/*把texta中获得的文本，进行初始化，与原字符串长度相等，并将该字符串对象的全部字符复制到该数组a[]中*/
+			texta.setText(null);
+			int n;
+			char secret=' ';
+			for(int i=0;i<a.length;i++)
+			{
+				char c=(char)(secret^a[i]);//进行异或运算
+				texta.append(""+c);
+			}
+		}
+		if(e.getSource()==button2)
+		{
+			char a[]=texta.getText().toCharArray();
+			texta.setText(null);
+			int n;
+			char secret=' ';
+			for(int i=0;i<a.length;i++)
+			{
+				char c=(char)(secret^a[i]);//再次异或运算，即还原
+				texta.append(""+c);
+			}
+		}
+	}
+}	                                                                                                 public class E1
+{
+	public static void main(String args[])
+	{
+        Myframe frame = new Myframe("加密与解密");
+	}
+}
